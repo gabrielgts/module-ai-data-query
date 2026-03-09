@@ -1,0 +1,178 @@
+<?php
+/** @var \Gtstudio\AiDataQuery\Block\Adminhtml\DataQueryChat $block */
+/** @var \Magento\Framework\Escaper $escaper */
+?>
+<link rel="stylesheet" href="<?= $escaper->escapeUrl($block->getViewFileUrl('Gtstudio_AiDataQuery::css/data-query-chat.css')) ?>">
+
+<div class="gtaidq-page-wrapper">
+    <div class="gtaidq-page-container">
+
+        <!-- Header -->
+        <div class="gtaidq-header">
+            <div class="gtaidq-header-title">
+                <div class="gtaidq-header-icon">⚡</div>
+                <div>
+                    <h1><?= $escaper->escapeHtml(__('Data Query Assistant')) ?></h1>
+                    <div class="gtaidq-header-subtitle">
+                        <?= $escaper->escapeHtml(__('Ask natural language questions about your store data')) ?>
+                    </div>
+                </div>
+            </div>
+            <div class="gtaidq-stats">
+                <div class="gtaidq-stat">
+                    <span class="gtaidq-stat-label"><?= $escaper->escapeHtml(__('Tokens')) ?></span>
+                    <span class="gtaidq-stat-value" id="gtaidq-token-count">0</span>
+                </div>
+                <div class="gtaidq-stat">
+                    <span class="gtaidq-stat-label"><?= $escaper->escapeHtml(__('Est. Cost')) ?></span>
+                    <span class="gtaidq-stat-value" id="gtaidq-estimated-cost">$0.00</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Privacy notice -->
+        <div class="gtaidq-privacy-notice">
+            <div class="gtaidq-privacy-icon">🔒</div>
+            <div class="gtaidq-privacy-text">
+                <strong><?= $escaper->escapeHtml(__('Privacy-first analytics')) ?></strong> —
+                <?= $escaper->escapeHtml(__(
+                    'Only your question is sent to the AI to determine which report to run. '
+                    . 'All store data is queried locally on your server and shown directly to you '
+                    . '— it never reaches the external AI provider.'
+                )) ?>
+            </div>
+        </div>
+
+        <!-- Chat body -->
+        <div class="gtaidq-body">
+
+            <!-- Messages -->
+            <div id="gtaidq-messages" class="gtaidq-messages">
+                <div class="gtaidq-welcome">
+                    <div class="gtaidq-welcome-icon">⚡</div>
+                    <p><?= $escaper->escapeHtml(__('Welcome to Data Query Assistant')) ?></p>
+                    <small><?= $escaper->escapeHtml(__('Ask natural language questions about your store data.')) ?></small>
+                    <div class="gtaidq-chips">
+                        <span class="gtaidq-chip" data-query="Top 10 products by revenue this month">
+                            📦 <?= $escaper->escapeHtml(__('Top products by revenue')) ?>
+                        </span>
+                        <span class="gtaidq-chip" data-query="Order status breakdown">
+                            📋 <?= $escaper->escapeHtml(__('Order status breakdown')) ?>
+                        </span>
+                        <span class="gtaidq-chip" data-query="Low inventory alert — products below 10 units">
+                            ⚠️ <?= $escaper->escapeHtml(__('Low inventory alert')) ?>
+                        </span>
+                        <span class="gtaidq-chip" data-query="Customer acquisition trends last 6 months">
+                            👥 <?= $escaper->escapeHtml(__('Acquisition trends')) ?>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input -->
+            <div class="gtaidq-input-area">
+                <div class="gtaidq-input-row">
+                    <textarea id="gtaidq-input"
+                              class="gtaidq-textarea"
+                              rows="1"
+                              placeholder="<?= $escaper->escapeHtmlAttr(__('Ask something — e.g. "Top 10 products by revenue this month"')) ?>"></textarea>
+                    <button id="gtaidq-send" class="gtaidq-btn-send"
+                            title="<?= $escaper->escapeHtmlAttr(__('Send (Enter)')) ?>">
+                        <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M2 21l21-9L2 3v7l15 2-15 2z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="gtaidq-actions">
+                <button id="gtaidq-export" class="gtaidq-btn-action gtaidq-btn-export"
+                        title="<?= $escaper->escapeHtmlAttr(__('Export conversation')) ?>">
+                    <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7z"/>
+                        <path d="M11 3L5.5 8.5l1.42 1.41L11 5.83V15h2V5.83l4.08 4.08L18.5 8.5z"/>
+                    </svg>
+                    <span><?= $escaper->escapeHtml(__('Export')) ?></span>
+                </button>
+                <button id="gtaidq-clear" class="gtaidq-btn-action gtaidq-btn-clear"
+                        title="<?= $escaper->escapeHtmlAttr(__('Clear conversation')) ?>">
+                    <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-9l-1 1H5v2h14V4z"/>
+                    </svg>
+                    <span><?= $escaper->escapeHtml(__('Clear')) ?></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Export Modal -->
+<div id="gtaidq-export-modal" class="gtaidq-modal">
+    <div class="gtaidq-modal-overlay"></div>
+    <div class="gtaidq-modal-content">
+        <div class="gtaidq-modal-header">
+            <h3><?= $escaper->escapeHtml(__('Export Conversation')) ?></h3>
+            <button id="gtaidq-modal-close" class="gtaidq-modal-close"
+                    title="<?= $escaper->escapeHtmlAttr(__('Close')) ?>">
+                <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/>
+                </svg>
+            </button>
+        </div>
+        <div class="gtaidq-modal-body">
+            <div class="gtaidq-export-options">
+                <label class="gtaidq-radio-option">
+                    <input type="radio" name="gtaidq-export-format" value="json" checked>
+                    <span class="gtaidq-radio-label">
+                        <strong>JSON</strong> — <?= $escaper->escapeHtml(__('Structured format for analysis')) ?>
+                    </span>
+                </label>
+                <label class="gtaidq-radio-option">
+                    <input type="radio" name="gtaidq-export-format" value="txt">
+                    <span class="gtaidq-radio-label">
+                        <strong>TEXT</strong> — <?= $escaper->escapeHtml(__('Human-readable format')) ?>
+                    </span>
+                </label>
+            </div>
+            <div class="gtaidq-export-filename">
+                <label for="gtaidq-filename-input"><?= $escaper->escapeHtml(__('Filename')) ?></label>
+                <input type="text" id="gtaidq-filename-input" class="gtaidq-filename-input"
+                       value="data-query-<?= $escaper->escapeHtmlAttr(date('Y-m-d')) ?>"
+                       placeholder="<?= $escaper->escapeHtmlAttr(__('Enter filename')) ?>">
+            </div>
+            <div class="gtaidq-export-summary">
+                <p><strong><?= $escaper->escapeHtml(__('Summary')) ?></strong></p>
+                <p class="gtaidq-summary-text">
+                    <span id="gtaidq-export-msg-count">0</span>
+                    <?= $escaper->escapeHtml(__('messages')) ?> &bull;
+                    <span id="gtaidq-export-token-count">0</span>
+                    <?= $escaper->escapeHtml(__('tokens')) ?> &bull;
+                    <?= $escaper->escapeHtml(__('Cost:')) ?>
+                    <span id="gtaidq-export-cost-display">$0.00</span>
+                </p>
+            </div>
+        </div>
+        <div class="gtaidq-modal-footer">
+            <button id="gtaidq-modal-cancel" class="gtaidq-btn gtaidq-btn-secondary">
+                <?= $escaper->escapeHtml(__('Cancel')) ?>
+            </button>
+            <button id="gtaidq-modal-download" class="gtaidq-btn gtaidq-btn-primary">
+                <?= $escaper->escapeHtml(__('Download')) ?>
+            </button>
+        </div>
+    </div>
+</div>
+
+<script type="text/x-magento-init">
+{
+    "*": {
+        "Gtstudio_AiDataQuery/js/data-query-chat": {
+            "endpointUrl": "<?= $escaper->escapeJs($block->getChatEndpointUrl()) ?>",
+            "formKey": "<?= $escaper->escapeJs($block->getFormKey()) ?>",
+            "pricingTable": <?= /* @noEscape */ $block->getPricingTableJson() ?>,
+            "defaultModel": "<?= $escaper->escapeJs($block->getDefaultModel()) ?>"
+        }
+    }
+}
+</script>

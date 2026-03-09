@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="Gtstudio_AiDataQuery::chat"
+             title="Data Query"
+             module="Gtstudio_AiDataQuery"
+             sortOrder="10"
+             parent="Gtstudio_AiConnector::gtstudio"
+             action="ai_data_query/index/index"
+             resource="Gtstudio_AiDataQuery::management"
+             translate="title"/>
+    </menu>
+</config>

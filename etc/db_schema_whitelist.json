@@ -1,0 +1,24 @@
+{
+  "gtstudio_ai_entities": {
+    "column": {
+      "entity_id": true,
+      "code": true,
+      "label": true,
+      "description": true,
+      "collection_class": true,
+      "searchable_fields": true,
+      "filterable_fields": true,
+      "sortable_fields": true,
+      "max_results": true,
+      "is_active": true,
+      "created_at": true
+    },
+    "index": {
+      "GTSTUDIO_AI_ENTITIES_IS_ACTIVE": true
+    },
+    "constraint": {
+      "PRIMARY": true,
+      "GTSTUDIO_AI_ENTITIES_CODE_UNIQUE": true
+    }
+  }
+}

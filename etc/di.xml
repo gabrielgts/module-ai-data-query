@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <!-- Entity Registry -->
+    <preference for="Gtstudio\AiDataQuery\Api\EntityRegistryInterface"
+                type="Gtstudio\AiDataQuery\Model\EntityRegistry"/>
+
+    <!-- Entity Data Interface -->
+    <preference for="Gtstudio\AiDataQuery\Api\Data\EntityInterface"
+                type="Gtstudio\AiDataQuery\Model\Data\Entity"/>
+
+    <!-- Tool Executor Pool Registration -->
+    <type name="Gtstudio\AiAgents\Model\Tool\ToolExecutorPool">
+        <arguments>
+            <argument name="executors" xsi:type="array">
+                <item name="query_entity" xsi:type="object">
+                    Gtstudio\AiDataQuery\Model\Tool\GetEntityDataExecutor
+                </item>
+                <item name="order_analytics" xsi:type="object">
+                    Gtstudio\AiDataQuery\Model\Tool\GetOrderAnalyticsExecutor
+                </item>
+                <item name="customer_lifetime_value" xsi:type="object">
+                    Gtstudio\AiDataQuery\Model\Tool\GetCustomerLifetimeValueExecutor
+                </item>
+                <item name="product_performance" xsi:type="object">
+                    Gtstudio\AiDataQuery\Model\Tool\GetProductPerformanceExecutor
+                </item>
+            </argument>
+        </arguments>
+    </type>
+</config>
