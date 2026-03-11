@@ -1,6 +1,5 @@
 {
     "name": "gtstudio/module-ai-data-query",
-    "version": "1.0.0",
     "description": "Natural-language data query interface for Magento 2. Lets admin users ask questions in plain English; the AI extracts intent and queries Magento entities locally — no raw store data sent to the LLM.",
     "type": "magento2-module",
     "license": "BUSL-1.1",
