@@ -13,7 +13,7 @@
         "php": ">=8.1",
         "magento/framework": ">=2.4.4",
         "gtstudio/module-aiconnector": ">=1.0.0",
-        "gtstudio/module-aiagents": ">=1.0.0"
+        "gtstudio/module-ai-agents": ">=1.0.0"
     },
     "autoload": {
         "files": [
