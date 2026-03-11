@@ -2,11 +2,20 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
     <menu>
+
+        <add id="Gtstudio_AiDataQuery::mcp_tools"
+            title="MCP Tools"
+            module="Gtstudio_AiDataQuery"
+            sortOrder="20"
+            parent="Gtstudio_AiConnector::gtstudio"
+            resource="Gtstudio_AiDataQuery::management"
+            translate="title"/>
+
         <add id="Gtstudio_AiDataQuery::chat"
              title="Data Query"
              module="Gtstudio_AiDataQuery"
              sortOrder="10"
-             parent="Gtstudio_AiConnector::gtstudio"
+             parent="Gtstudio_AiDataQuery::mcp_tools"
              action="ai_data_query/index/index"
              resource="Gtstudio_AiDataQuery::management"
              translate="title"/>
