@@ -2,6 +2,23 @@
 
 Natural-language data query interface for Magento 2. Ask questions in plain English — the AI figures out what to query, the query runs locally, and results are returned directly to the browser. **No store data is ever sent to the LLM.**
 
+## Preview
+
+![AiDataQuery — asking plain-English questions and getting store analytics results](docs/images/aidataquery-preview.gif)
+
+## AI Studio Ecosystem
+
+Part of the **AI Studio** suite for Magento 2. See all modules:
+
+| Module | Repository | Description |
+|--------|-----------|-------------|
+| **Gtstudio_AiConnector** | [module-aiconnector](https://github.com/gabrielgts/module-aiconnector) | Core AI provider abstraction |
+| **Gtstudio_AiAgents** | [module-ai-agents](https://github.com/gabrielgts/module-ai-agents) | Agent & tool orchestration, cron scheduling, execution log |
+| **Gtstudio_AiWidgets** | [module-ai-widgets](https://github.com/gabrielgts/module-ai-widgets) | Floating admin chat widget + PageBuilder AI generator |
+| **Gtstudio_AiDataQuery** | *(this module)* | Natural-language store analytics (privacy-first) |
+| **Gtstudio_AiKnowledgeBase** | [module-ai-knowledge-base](https://github.com/gabrielgts/module-ai-knowledge-base) | Document upload & RAG retrieval for agents |
+| **Gtstudio_AiDashboard** | *(coming soon)* | AI-powered KPI dashboard with ML insights |
+
 ## What It Does
 
 - Admin chat page where users type questions like *"Show me the top 10 orders from last month"* or *"Which products have less than 5 units in stock?"*
@@ -29,11 +46,9 @@ All actual database queries run on your server. Results are displayed to the use
 ## Installation
 
 ```bash
+composer require gtstudio/module-ai-data-query
 php bin/magento module:enable Gtstudio_AiDataQuery
 php bin/magento setup:upgrade
-php bin/magento setup:di:compile
-php bin/magento setup:static-content:deploy -f --area adminhtml
-php bin/magento cache:flush
 ```
 
 A database agent record with code `data_query` is created automatically via a data patch.
