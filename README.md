@@ -17,7 +17,7 @@ Part of the **AI Studio** suite for Magento 2. See all modules:
 | **Gtstudio_AiWidgets** | [module-ai-widgets](https://github.com/gabrielgts/module-ai-widgets) | Floating admin chat widget + PageBuilder AI generator |
 | **Gtstudio_AiDataQuery** | *(this module)* | Natural-language store analytics (privacy-first) |
 | **Gtstudio_AiKnowledgeBase** | [module-ai-knowledge-base](https://github.com/gabrielgts/module-ai-knowledge-base) | Document upload & RAG retrieval for agents |
-| **Gtstudio_AiDashboard** | *(coming soon)* | AI-powered KPI dashboard with ML insights |
+| **Gtstudio_AiDashboard** | [module-ai-dashboard](https://github.com/gabrielgts/module-ai-dashboard) | AI-powered KPI dashboard with ML insights |
 
 ## What It Does
 
