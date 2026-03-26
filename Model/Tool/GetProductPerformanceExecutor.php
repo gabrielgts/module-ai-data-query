@@ -8,19 +8,30 @@ use Magento\Framework\Exception\LocalizedException;
 
 class GetProductPerformanceExecutor implements ToolExecutorInterface
 {
+    /** @var ResourceConnection */
     private ResourceConnection $resourceConnection;
 
+    /**
+     * @param ResourceConnection $resourceConnection
+     */
     public function __construct(ResourceConnection $resourceConnection)
     {
         $this->resourceConnection = $resourceConnection;
     }
 
+    /**
+     * Execute the product performance analysis.
+     *
+     * @param array $inputs
+     * @return mixed
+     */
     public function execute(array $inputs): mixed
     {
         $analysisType = $inputs['analysis_type'] ?? null;
 
         if (empty($analysisType)) {
-            return "Error: analysis_type parameter is required (top_sellers, low_performers, revenue_by_category, product_trends, inventory_alert)";
+            return "Error: analysis_type parameter is required "
+                . "(top_sellers, low_performers, revenue_by_category, product_trends, inventory_alert)";
         }
 
         try {
@@ -39,6 +50,12 @@ class GetProductPerformanceExecutor implements ToolExecutorInterface
         }
     }
 
+    /**
+     * Get top selling products by revenue.
+     *
+     * @param array $inputs
+     * @return string
+     */
     private function getTopSellers(array $inputs): string
     {
         $limit = min((int)($inputs['limit'] ?? 20), 100);
@@ -100,6 +117,12 @@ class GetProductPerformanceExecutor implements ToolExecutorInterface
         return $summary;
     }
 
+    /**
+     * Get products with zero recent sales.
+     *
+     * @param array $inputs
+     * @return string
+     */
     private function getLowPerformers(array $inputs): string
     {
         $limit = min((int)($inputs['limit'] ?? 20), 100);
@@ -150,6 +173,12 @@ class GetProductPerformanceExecutor implements ToolExecutorInterface
         return $summary;
     }
 
+    /**
+     * Get revenue breakdown by category.
+     *
+     * @param array $inputs
+     * @return string
+     */
     private function getRevenueByCategory(array $inputs): string
     {
         $days = (int)($inputs['days'] ?? 30);
@@ -207,6 +236,12 @@ class GetProductPerformanceExecutor implements ToolExecutorInterface
         return $summary;
     }
 
+    /**
+     * Get daily product sales trends.
+     *
+     * @param array $inputs
+     * @return string
+     */
     private function getProductTrends(array $inputs): string
     {
         $days = (int)($inputs['days'] ?? 30);
@@ -254,6 +289,12 @@ class GetProductPerformanceExecutor implements ToolExecutorInterface
         return $summary;
     }
 
+    /**
+     * Get products below the inventory threshold.
+     *
+     * @param array $inputs
+     * @return string
+     */
     private function getInventoryAlert(array $inputs): string
     {
         $threshold = (int)($inputs['threshold'] ?? 10);
@@ -287,7 +328,11 @@ class GetProductPerformanceExecutor implements ToolExecutorInterface
 
         foreach ($results as $product) {
             if ($product['is_in_stock'] == 0) {
-                $summary .= sprintf("OUT OF STOCK: SKU %s (%d units)\n", $product['sku'], $product['quantity_in_stock']);
+                $summary .= sprintf(
+                    "OUT OF STOCK: SKU %s (%d units)\n",
+                    $product['sku'],
+                    $product['quantity_in_stock']
+                );
                 $outOfStock++;
             } else {
                 $summary .= sprintf("LOW STOCK: SKU %s (%d units)\n", $product['sku'], $product['quantity_in_stock']);

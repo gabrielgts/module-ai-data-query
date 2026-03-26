@@ -8,19 +8,30 @@ use Magento\Framework\Exception\LocalizedException;
 
 class GetCustomerLifetimeValueExecutor implements ToolExecutorInterface
 {
+    /** @var ResourceConnection */
     private ResourceConnection $resourceConnection;
 
+    /**
+     * @param ResourceConnection $resourceConnection
+     */
     public function __construct(ResourceConnection $resourceConnection)
     {
         $this->resourceConnection = $resourceConnection;
     }
 
+    /**
+     * Execute the customer lifetime value analysis.
+     *
+     * @param array $inputs
+     * @return mixed
+     */
     public function execute(array $inputs): mixed
     {
         $analysisType = $inputs['analysis_type'] ?? null;
 
         if (empty($analysisType)) {
-            return "Error: analysis_type parameter is required (lifetime_value, rfm_analysis, acquisition_trends, top_segment)";
+            return "Error: analysis_type parameter is required "
+                . "(lifetime_value, rfm_analysis, acquisition_trends, top_segment)";
         }
 
         try {
@@ -38,6 +49,12 @@ class GetCustomerLifetimeValueExecutor implements ToolExecutorInterface
         }
     }
 
+    /**
+     * Get lifetime value distribution across customer tiers.
+     *
+     * @param array $inputs
+     * @return string
+     */
     private function getLifetimeValueDistribution(array $inputs): string
     {
         $connection = $this->resourceConnection->getConnection();
@@ -111,6 +128,12 @@ class GetCustomerLifetimeValueExecutor implements ToolExecutorInterface
         return $summary;
     }
 
+    /**
+     * Get RFM (Recency, Frequency, Monetary) analysis.
+     *
+     * @param array $inputs
+     * @return string
+     */
     private function getRFMAnalysis(array $inputs): string
     {
         $connection = $this->resourceConnection->getConnection();
@@ -176,6 +199,12 @@ class GetCustomerLifetimeValueExecutor implements ToolExecutorInterface
         return $summary;
     }
 
+    /**
+     * Get customer acquisition trends by month.
+     *
+     * @param array $inputs
+     * @return string
+     */
     private function getAcquisitionTrends(array $inputs): string
     {
         $months = (int)($inputs['months'] ?? 12);
@@ -221,6 +250,12 @@ class GetCustomerLifetimeValueExecutor implements ToolExecutorInterface
         return $summary;
     }
 
+    /**
+     * Get top customers for a given segment.
+     *
+     * @param array $inputs
+     * @return string
+     */
     private function getTopSegment(array $inputs): string
     {
         $segment = $inputs['segment'] ?? 'best_customers'; // best_customers, repeat_buyers, new_customers

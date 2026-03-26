@@ -9,9 +9,16 @@ use Magento\Framework\Exception\LocalizedException;
 
 class GetOrderAnalyticsExecutor implements ToolExecutorInterface
 {
+    /** @var ResourceConnection */
     private ResourceConnection $resourceConnection;
+
+    /** @var CollectionFactory */
     private CollectionFactory $orderCollectionFactory;
 
+    /**
+     * @param ResourceConnection $resourceConnection
+     * @param CollectionFactory $orderCollectionFactory
+     */
     public function __construct(
         ResourceConnection $resourceConnection,
         CollectionFactory $orderCollectionFactory
@@ -20,12 +27,19 @@ class GetOrderAnalyticsExecutor implements ToolExecutorInterface
         $this->orderCollectionFactory = $orderCollectionFactory;
     }
 
+    /**
+     * Execute the order analytics analysis.
+     *
+     * @param array $inputs
+     * @return mixed
+     */
     public function execute(array $inputs): mixed
     {
         $analysisType = $inputs['analysis_type'] ?? null;
 
         if (empty($analysisType)) {
-            return "Error: analysis_type parameter is required (daily_sales, order_status, avg_order_value, top_customers, sales_by_period)";
+            return "Error: analysis_type parameter is required "
+                . "(daily_sales, order_status, avg_order_value, top_customers, sales_by_period)";
         }
 
         try {
@@ -44,6 +58,12 @@ class GetOrderAnalyticsExecutor implements ToolExecutorInterface
         }
     }
 
+    /**
+     * Get daily sales analysis.
+     *
+     * @param array $inputs
+     * @return string
+     */
     private function getDailySalesAnalysis(array $inputs): string
     {
         $connection = $this->resourceConnection->getConnection();
@@ -53,7 +73,10 @@ class GetOrderAnalyticsExecutor implements ToolExecutorInterface
         $startDate = date('Y-m-d', strtotime("-$days days"));
 
         $sql = "
-            SELECT DATE(created_at) as order_date, COUNT(*) as order_count, SUM(grand_total) as daily_revenue
+            SELECT
+                DATE(created_at) as order_date,
+                COUNT(*) as order_count,
+                SUM(grand_total) as daily_revenue
             FROM $salesOrderTable
             WHERE created_at >= '$startDate'
             GROUP BY DATE(created_at)
@@ -92,13 +115,22 @@ class GetOrderAnalyticsExecutor implements ToolExecutorInterface
         return $summary;
     }
 
+    /**
+     * Get order count and revenue broken down by status.
+     *
+     * @param array $inputs
+     * @return string
+     */
     private function getOrderStatusAnalysis(array $inputs): string
     {
         $connection = $this->resourceConnection->getConnection();
         $salesOrderTable = $this->resourceConnection->getTableName('sales_order');
 
         $sql = "
-            SELECT status, COUNT(*) as count, SUM(grand_total) as revenue
+            SELECT
+                status,
+                COUNT(*) as count,
+                SUM(grand_total) as revenue
             FROM $salesOrderTable
             GROUP BY status
             ORDER BY count DESC
@@ -130,6 +162,12 @@ class GetOrderAnalyticsExecutor implements ToolExecutorInterface
         return $summary;
     }
 
+    /**
+     * Get average, min, and max order values.
+     *
+     * @param array $inputs
+     * @return string
+     */
     private function getAverageOrderValue(array $inputs): string
     {
         $connection = $this->resourceConnection->getConnection();
@@ -171,6 +209,12 @@ class GetOrderAnalyticsExecutor implements ToolExecutorInterface
         );
     }
 
+    /**
+     * Get top customers ranked by total spend.
+     *
+     * @param array $inputs
+     * @return string
+     */
     private function getTopCustomers(array $inputs): string
     {
         $connection = $this->resourceConnection->getConnection();
@@ -210,6 +254,12 @@ class GetOrderAnalyticsExecutor implements ToolExecutorInterface
         return $summary;
     }
 
+    /**
+     * Get sales aggregated by period (month, quarter, or year).
+     *
+     * @param array $inputs
+     * @return string
+     */
     private function getSalesByPeriod(array $inputs): string
     {
         $period = $inputs['period'] ?? 'month'; // month, quarter, year

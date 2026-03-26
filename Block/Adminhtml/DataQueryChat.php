@@ -10,6 +10,12 @@ use Magento\Backend\Block\Template\Context;
 
 class DataQueryChat extends Template
 {
+    /**
+     * @param Context $context
+     * @param TokenCostServiceInterface $tokenCostService
+     * @param ConfigProvider $configProvider
+     * @param array $data
+     */
     public function __construct(
         Context $context,
         private readonly TokenCostServiceInterface $tokenCostService,
@@ -19,11 +25,21 @@ class DataQueryChat extends Template
         parent::__construct($context, $data);
     }
 
+    /**
+     * Get the AJAX endpoint URL for the chat controller.
+     *
+     * @return string
+     */
     public function getChatEndpointUrl(): string
     {
         return $this->_urlBuilder->getUrl('ai_data_query/chat/message');
     }
 
+    /**
+     * Get the current form key for CSRF protection.
+     *
+     * @return string
+     */
     public function getFormKey(): string
     {
         return $this->formKey->getFormKey();
@@ -31,6 +47,8 @@ class DataQueryChat extends Template
 
     /**
      * Return the pricing table as a JSON-encoded string for injection into JS.
+     *
+     * @return string
      */
     public function getPricingTableJson(): string
     {
@@ -39,6 +57,8 @@ class DataQueryChat extends Template
 
     /**
      * Return the configured model identifier.
+     *
+     * @return string
      */
     public function getDefaultModel(): string
     {

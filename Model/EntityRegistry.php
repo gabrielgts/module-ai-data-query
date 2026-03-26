@@ -10,15 +10,29 @@ use Magento\Framework\Exception\CouldNotDeleteException;
 
 class EntityRegistry implements EntityRegistryInterface
 {
+    /** @var ResourceConnection */
     private ResourceConnection $resourceConnection;
+
+    /** @var array */
     private array $entities = [];
+
+    /** @var bool */
     private bool $loaded = false;
 
+    /**
+     * @param ResourceConnection $resourceConnection
+     */
     public function __construct(ResourceConnection $resourceConnection)
     {
         $this->resourceConnection = $resourceConnection;
     }
 
+    /**
+     * Get entity by code.
+     *
+     * @param string $code
+     * @return EntityInterface|null
+     */
     public function get(string $code): ?EntityInterface
     {
         $this->loadAll();
@@ -26,6 +40,11 @@ class EntityRegistry implements EntityRegistryInterface
         return $this->entities[$code] ?? null;
     }
 
+    /**
+     * Get all registered entities.
+     *
+     * @return array
+     */
     public function getAll(): array
     {
         $this->loadAll();
@@ -33,6 +52,12 @@ class EntityRegistry implements EntityRegistryInterface
         return $this->entities;
     }
 
+    /**
+     * Check if entity is queryable.
+     *
+     * @param string $code
+     * @return bool
+     */
     public function isQueryable(string $code): bool
     {
         $entity = $this->get($code);
@@ -40,6 +65,11 @@ class EntityRegistry implements EntityRegistryInterface
         return $entity !== null && $entity->isActive();
     }
 
+    /**
+     * Load all active entities from the database.
+     *
+     * @return void
+     */
     private function loadAll(): void
     {
         if ($this->loaded) {

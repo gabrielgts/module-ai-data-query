@@ -9,9 +9,16 @@ use Magento\Framework\Exception\LocalizedException;
 
 class GetEntityDataExecutor implements ToolExecutorInterface
 {
+    /** @var EntityRegistryInterface */
     private EntityRegistryInterface $entityRegistry;
+
+    /** @var ObjectManagerInterface */
     private ObjectManagerInterface $objectManager;
 
+    /**
+     * @param EntityRegistryInterface $entityRegistry
+     * @param ObjectManagerInterface $objectManager
+     */
     public function __construct(
         EntityRegistryInterface $entityRegistry,
         ObjectManagerInterface $objectManager
@@ -20,6 +27,12 @@ class GetEntityDataExecutor implements ToolExecutorInterface
         $this->objectManager = $objectManager;
     }
 
+    /**
+     * Execute the entity data query.
+     *
+     * @param array $inputs
+     * @return mixed
+     */
     public function execute(array $inputs): mixed
     {
         $entityCode = $inputs['entity_code'] ?? null;
@@ -97,6 +110,14 @@ class GetEntityDataExecutor implements ToolExecutorInterface
         }
     }
 
+    /**
+     * Validate that all requested fields are in the allowed list.
+     *
+     * @param array $requested
+     * @param array $allowed
+     * @return void
+     * @throws LocalizedException
+     */
     private function validateFields(array $requested, array $allowed): void
     {
         $invalid = array_diff($requested, $allowed);
@@ -107,6 +128,14 @@ class GetEntityDataExecutor implements ToolExecutorInterface
         }
     }
 
+    /**
+     * Validate that all filter keys are in the allowed filterable fields list.
+     *
+     * @param array $filters
+     * @param array $allowed
+     * @return void
+     * @throws LocalizedException
+     */
     private function validateFilters(array $filters, array $allowed): void
     {
         $invalidFields = array_diff(array_keys($filters), $allowed);
@@ -117,6 +146,13 @@ class GetEntityDataExecutor implements ToolExecutorInterface
         }
     }
 
+    /**
+     * Format collection items as a text summary.
+     *
+     * @param mixed $collection
+     * @param array $fields
+     * @return string
+     */
     private function formatResults($collection, array $fields): string
     {
         $items = $collection->getItems();
@@ -144,6 +180,12 @@ class GetEntityDataExecutor implements ToolExecutorInterface
         return $formatted;
     }
 
+    /**
+     * Format a field value for display.
+     *
+     * @param mixed $value
+     * @return string
+     */
     private function formatValue($value): string
     {
         if (is_bool($value)) {

@@ -37,6 +37,13 @@ use Psr\Log\LoggerInterface;
  */
 class DataQueryChatService
 {
+    /**
+     * @param MagentoAgentFactory $agentFactory
+     * @param NeuronClient $neuronClient
+     * @param ConfigProvider $configProvider
+     * @param ToolExecutorPool $toolExecutorPool
+     * @param LoggerInterface $logger
+     */
     public function __construct(
         private readonly MagentoAgentFactory $agentFactory,
         private readonly NeuronClient $neuronClient,
@@ -48,10 +55,11 @@ class DataQueryChatService
 
     /**
      * Resolve query intent from the user's question, then execute the tool locally.
+     *
      * Store data never reaches the LLM.
      *
      * @param string $message
-     * @return array{content: string, data: string|null, tool: string|null, tokens: int, model: string, provider: string}
+     * @return array
      */
     public function ask(string $message): array
     {
@@ -185,26 +193,42 @@ class DataQueryChatService
         return (string) new SystemPrompt(
             background: [
                 'You are a Magento store data query planner.',
-                'Your sole role is to understand the user\'s question and select the correct analytics tool and parameters.',
+                'Your sole role is to understand the user\'s question and select the correct analytics tool'
+                    . ' and parameters.',
                 'You have NO access to any store data. You will never see, receive, or analyze actual store data.',
-                'Store data is queried locally on the server and shown directly to the user — it never passes through you.',
+                'Store data is queried locally on the server and shown directly to the user'
+                    . ' — it never passes through you.',
                 'Available tools:',
-                '  - order_analytics: Analyze orders. analysis_type values: daily_sales, order_status, avg_order_value, top_customers, sales_by_period. Optional: days (integer), limit (integer), period (month/quarter/year).',
-                '  - customer_lifetime_value: Analyze customers. analysis_type values: lifetime_value, rfm_analysis, acquisition_trends, top_segment. Optional: months (integer), segment (best_customers/repeat_buyers/new_customers).',
-                '  - product_performance: Analyze products. analysis_type values: top_sellers, low_performers, revenue_by_category, product_trends, inventory_alert. Optional: days (integer), limit (integer), threshold (integer).',
-                '  - query_entity: General entity query. Required: entity_code (sales_order/customer_entity/catalog_product/sales_invoice/sales_shipment). Optional: fields (array), filters (object), sort (object with "field" and "direction"), limit (integer). IMPORTANT: Magento uses "entity_id" as the primary key — never use "id".',
+                '  - order_analytics: Analyze orders. analysis_type values: daily_sales, order_status, avg_order_value,'
+                    . ' top_customers, sales_by_period. Optional: days (integer), limit (integer),'
+                    . ' period (month/quarter/year).',
+                '  - customer_lifetime_value: Analyze customers. analysis_type values: lifetime_value, rfm_analysis,'
+                    . ' acquisition_trends, top_segment. Optional: months (integer),'
+                    . ' segment (best_customers/repeat_buyers/new_customers).',
+                '  - product_performance: Analyze products. analysis_type values: top_sellers, low_performers,'
+                    . ' revenue_by_category, product_trends, inventory_alert.'
+                    . ' Optional: days (integer), limit (integer), threshold (integer).',
+                '  - query_entity: General entity query.'
+                    . ' Required: entity_code (sales_order/customer_entity/catalog_product'
+                    . '/sales_invoice/sales_shipment).'
+                    . ' Optional: fields (array), filters (object), sort (object with "field" and "direction"),'
+                    . ' limit (integer).'
+                    . ' IMPORTANT: Magento uses "entity_id" as the primary key — never use "id".',
             ],
             steps: [
                 'Read the user\'s question and identify what data they need.',
                 'Select the most appropriate tool based on the question.',
-                'Determine the correct parameters. Use sensible defaults when the user does not specify (e.g. days=30, limit=10).',
+                'Determine the correct parameters. Use sensible defaults when the user does not specify'
+                    . ' (e.g. days=30, limit=10).',
                 'Write a single short, friendly sentence to introduce the results.',
             ],
             output: [
                 'Respond with ONLY a JSON object — no markdown, no explanation outside the JSON.',
                 'The JSON must have exactly three fields: tool_code, parameters_json, explanation.',
                 'tool_code: one of order_analytics, customer_lifetime_value, product_performance, query_entity.',
-                'parameters_json: a valid JSON-encoded string. Example: {"analysis_type":"daily_sales","days":30}. For query_entity sort use {"field":"entity_id","direction":"DESC"}.',
+                'parameters_json: a valid JSON-encoded string.'
+                    . ' Example: {"analysis_type":"daily_sales","days":30}.'
+                    . ' For query_entity sort use {"field":"entity_id","direction":"DESC"}.',
                 'explanation: one sentence only. Example: "Here are your daily sales for the last 30 days:".',
                 'Never include actual data values, numbers, or analysis in your response.',
             ]

@@ -4,24 +4,32 @@ declare(strict_types=1);
 
 namespace Gtstudio\AiDataQuery\Setup\Patch\Data;
 
+use Gtstudio\AiDataQuery\Model\Tool\GetCustomerLifetimeValueExecutor;
+use Gtstudio\AiDataQuery\Model\Tool\GetOrderAnalyticsExecutor;
+use Gtstudio\AiDataQuery\Model\Tool\GetProductPerformanceExecutor;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\Setup\Patch\DataPatchInterface;
-use Gtstudio\AiDataQuery\Setup\Patch\Data\BootstrapDataQueryEntityRegistry;
 
 class BootstrapPhase2SpecializedTools implements DataPatchInterface
 {
+    /** @var ResourceConnection */
     private ResourceConnection $resourceConnection;
 
+    /**
+     * @param ResourceConnection $resourceConnection
+     */
     public function __construct(ResourceConnection $resourceConnection)
     {
         $this->resourceConnection = $resourceConnection;
     }
 
-    public function apply()
+    /**
+     * @inheritdoc
+     */
+    public function apply(): self
     {
         $connection = $this->resourceConnection->getConnection();
 
-        // Create Phase 2 specialized tools
         $this->createOrderAnalyticsTool($connection);
         $this->createCustomerLifetimeValueTool($connection);
         $this->createProductPerformanceTool($connection);
@@ -29,6 +37,12 @@ class BootstrapPhase2SpecializedTools implements DataPatchInterface
         return $this;
     }
 
+    /**
+     * Create the order_analytics tool record.
+     *
+     * @param mixed $connection
+     * @return void
+     */
     private function createOrderAnalyticsTool($connection): void
     {
         if ($this->toolExists($connection, 'order_analytics')) {
@@ -41,7 +55,8 @@ class BootstrapPhase2SpecializedTools implements DataPatchInterface
             [
                 'name' => 'analysis_type',
                 'type' => 'string',
-                'description' => 'Type of analysis: daily_sales, order_status, avg_order_value, top_customers, sales_by_period',
+                'description' => 'Type of analysis: daily_sales, order_status, avg_order_value, '
+                    . 'top_customers, sales_by_period',
                 'required' => true,
             ],
             [
@@ -69,13 +84,19 @@ class BootstrapPhase2SpecializedTools implements DataPatchInterface
             'description' => 'Analyze order metrics, trends, revenue, and customer spending patterns',
             'properties' => json_encode($properties),
             'additional_configs' => json_encode([
-                'executor' => 'Gtstudio\AiDataQuery\Model\Tool\GetOrderAnalyticsExecutor',
+                'executor' => GetOrderAnalyticsExecutor::class,
             ]),
         ];
 
         $connection->insert($toolsTable, $data);
     }
 
+    /**
+     * Create the customer_lifetime_value tool record.
+     *
+     * @param mixed $connection
+     * @return void
+     */
     private function createCustomerLifetimeValueTool($connection): void
     {
         if ($this->toolExists($connection, 'customer_lifetime_value')) {
@@ -107,16 +128,23 @@ class BootstrapPhase2SpecializedTools implements DataPatchInterface
 
         $data = [
             'code' => 'customer_lifetime_value',
-            'description' => 'Analyze customer lifetime value, RFM segmentation, acquisition trends, and customer segments',
+            'description' => 'Analyze customer lifetime value, RFM segmentation, '
+                . 'acquisition trends, and customer segments',
             'properties' => json_encode($properties),
             'additional_configs' => json_encode([
-                'executor' => 'Gtstudio\AiDataQuery\Model\Tool\GetCustomerLifetimeValueExecutor',
+                'executor' => GetCustomerLifetimeValueExecutor::class,
             ]),
         ];
 
         $connection->insert($toolsTable, $data);
     }
 
+    /**
+     * Create the product_performance tool record.
+     *
+     * @param mixed $connection
+     * @return void
+     */
     private function createProductPerformanceTool($connection): void
     {
         if ($this->toolExists($connection, 'product_performance')) {
@@ -129,7 +157,8 @@ class BootstrapPhase2SpecializedTools implements DataPatchInterface
             [
                 'name' => 'analysis_type',
                 'type' => 'string',
-                'description' => 'Type of analysis: top_sellers, low_performers, revenue_by_category, product_trends, inventory_alert',
+                'description' => 'Type of analysis: top_sellers, low_performers, revenue_by_category, '
+                    . 'product_trends, inventory_alert',
                 'required' => true,
             ],
             [
@@ -154,16 +183,24 @@ class BootstrapPhase2SpecializedTools implements DataPatchInterface
 
         $data = [
             'code' => 'product_performance',
-            'description' => 'Analyze product performance, sales trends, category revenue, inventory levels, and sales metrics',
+            'description' => 'Analyze product performance, sales trends, category revenue, '
+                . 'inventory levels, and sales metrics',
             'properties' => json_encode($properties),
             'additional_configs' => json_encode([
-                'executor' => 'Gtstudio\AiDataQuery\Model\Tool\GetProductPerformanceExecutor',
+                'executor' => GetProductPerformanceExecutor::class,
             ]),
         ];
 
         $connection->insert($toolsTable, $data);
     }
 
+    /**
+     * Check if a tool with the given code already exists.
+     *
+     * @param mixed $connection
+     * @param string $code
+     * @return bool
+     */
     private function toolExists($connection, string $code): bool
     {
         $toolsTable = $this->resourceConnection->getTableName('gtstudio_ai_tools');
@@ -173,14 +210,20 @@ class BootstrapPhase2SpecializedTools implements DataPatchInterface
         return (bool)$existing;
     }
 
-    public static function getDependencies()
+    /**
+     * @inheritdoc
+     */
+    public static function getDependencies(): array
     {
         return [
             BootstrapDataQueryEntityRegistry::class,
         ];
     }
 
-    public function getAliases()
+    /**
+     * @inheritdoc
+     */
+    public function getAliases(): array
     {
         return [];
     }

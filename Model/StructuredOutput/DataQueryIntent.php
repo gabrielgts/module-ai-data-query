@@ -17,17 +17,22 @@ class DataQueryIntent
     /**
      * The tool code to execute.
      * Must be one of: order_analytics, customer_lifetime_value, product_performance, query_entity
+     *
+     * @var string
      */
     #[SchemaProperty(
         description: 'The tool code to execute. Must be exactly one of: '
             . 'order_analytics, customer_lifetime_value, product_performance, query_entity',
         required: true
     )]
+    // phpcs:ignore Magento2.Commenting.ClassPropertyPHPDocFormatting.Missing
     public string $tool_code = '';
 
     /**
      * JSON-encoded string of parameters for the chosen tool.
      * Example: {"analysis_type":"daily_sales","days":30}
+     *
+     * @var string
      */
     #[SchemaProperty(
         description: 'JSON-encoded string of parameters for the selected tool. '
@@ -35,16 +40,20 @@ class DataQueryIntent
             . 'Example for product_performance: {"analysis_type":"top_sellers","limit":10}.',
         required: true
     )]
+    // phpcs:ignore Magento2.Commenting.ClassPropertyPHPDocFormatting.Missing
     public string $parameters_json = '{}';
 
     /**
      * A single short sentence that will introduce the query results to the user.
      * Example: "Here are your daily sales for the last 30 days:"
+     *
+     * @var string
      */
     #[SchemaProperty(
         description: 'A single friendly sentence introducing the results to the user. '
             . 'Example: "Here are your top 10 products by revenue this month:"',
         required: true
     )]
+    // phpcs:ignore Magento2.Commenting.ClassPropertyPHPDocFormatting.Missing
     public string $explanation = '';
 }

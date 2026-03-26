@@ -4,35 +4,52 @@ declare(strict_types=1);
 
 namespace Gtstudio\AiDataQuery\Setup\Patch\Data;
 
+use Gtstudio\AiDataQuery\Model\Tool\GetEntityDataExecutor;
+use Magento\Catalog\Model\ResourceModel\Product\Collection as ProductCollection;
+use Magento\Customer\Model\ResourceModel\Customer\Collection as CustomerCollection;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\Setup\Patch\DataPatchInterface;
+use Magento\Sales\Model\ResourceModel\Order\Collection as OrderCollection;
+use Magento\Sales\Model\ResourceModel\Order\Invoice\Collection as InvoiceCollection;
+use Magento\Sales\Model\ResourceModel\Order\Shipment\Collection as ShipmentCollection;
 
 class BootstrapDataQueryEntityRegistry implements DataPatchInterface
 {
     private const TOOL_CODE = 'query_entity';
 
+    /** @var ResourceConnection */
     private ResourceConnection $resourceConnection;
 
+    /**
+     * @param ResourceConnection $resourceConnection
+     */
     public function __construct(ResourceConnection $resourceConnection)
     {
         $this->resourceConnection = $resourceConnection;
     }
 
-    public function apply()
+    /**
+     * @inheritdoc
+     */
+    public function apply(): self
     {
         $connection = $this->resourceConnection->getConnection();
 
-        // Create query_entity tool if it doesn't exist
         if (!$this->toolExists($connection)) {
             $this->createQueryEntityTool($connection);
         }
 
-        // Bootstrap common queryable entities
         $this->bootstrapEntities($connection);
 
         return $this;
     }
 
+    /**
+     * Create the query_entity tool record.
+     *
+     * @param mixed $connection
+     * @return void
+     */
     private function createQueryEntityTool($connection): void
     {
         $toolsTable = $this->resourceConnection->getTableName('gtstudio_ai_tools');
@@ -72,16 +89,23 @@ class BootstrapDataQueryEntityRegistry implements DataPatchInterface
 
         $data = [
             'code' => self::TOOL_CODE,
-            'description' => 'Query any registered Magento entity by code, with optional filters, sorting, and field selection',
+            'description' => 'Query any registered Magento entity by code, '
+                . 'with optional filters, sorting, and field selection',
             'properties' => json_encode($properties),
             'additional_configs' => json_encode([
-                'executor' => 'Gtstudio\AiDataQuery\Model\Tool\GetEntityDataExecutor',
+                'executor' => GetEntityDataExecutor::class,
             ]),
         ];
 
         $connection->insert($toolsTable, $data);
     }
 
+    /**
+     * Bootstrap common queryable entity records.
+     *
+     * @param mixed $connection
+     * @return void
+     */
     private function bootstrapEntities($connection): void
     {
         $entitiesTable = $this->resourceConnection->getTableName('gtstudio_ai_entities');
@@ -91,8 +115,10 @@ class BootstrapDataQueryEntityRegistry implements DataPatchInterface
                 'code' => 'sales_order',
                 'label' => 'Orders',
                 'description' => 'Store orders',
-                'collection_class' => 'Magento\Sales\Model\ResourceModel\Order\Collection',
-                'searchable_fields' => json_encode(['entity_id', 'increment_id', 'customer_email', 'status', 'created_at', 'grand_total']),
+                'collection_class' => OrderCollection::class,
+                'searchable_fields' => json_encode(
+                    ['entity_id', 'increment_id', 'customer_email', 'status', 'created_at', 'grand_total']
+                ),
                 'filterable_fields' => json_encode(['status', 'created_at', 'grand_total', 'customer_email']),
                 'sortable_fields' => json_encode(['created_at', 'grand_total', 'entity_id']),
                 'max_results' => 100,
@@ -102,8 +128,10 @@ class BootstrapDataQueryEntityRegistry implements DataPatchInterface
                 'code' => 'customer_entity',
                 'label' => 'Customers',
                 'description' => 'Registered customers',
-                'collection_class' => 'Magento\Customer\Model\ResourceModel\Customer\Collection',
-                'searchable_fields' => json_encode(['entity_id', 'email', 'firstname', 'lastname', 'created_at']),
+                'collection_class' => CustomerCollection::class,
+                'searchable_fields' => json_encode(
+                    ['entity_id', 'email', 'firstname', 'lastname', 'created_at']
+                ),
                 'filterable_fields' => json_encode(['email', 'created_at', 'group_id']),
                 'sortable_fields' => json_encode(['created_at', 'email']),
                 'max_results' => 100,
@@ -113,8 +141,10 @@ class BootstrapDataQueryEntityRegistry implements DataPatchInterface
                 'code' => 'catalog_product',
                 'label' => 'Products',
                 'description' => 'Catalog products',
-                'collection_class' => 'Magento\Catalog\Model\ResourceModel\Product\Collection',
-                'searchable_fields' => json_encode(['entity_id', 'sku', 'name', 'price', 'status', 'visibility']),
+                'collection_class' => ProductCollection::class,
+                'searchable_fields' => json_encode(
+                    ['entity_id', 'sku', 'name', 'price', 'status', 'visibility']
+                ),
                 'filterable_fields' => json_encode(['status', 'visibility', 'price', 'sku']),
                 'sortable_fields' => json_encode(['name', 'price', 'created_at']),
                 'max_results' => 100,
@@ -124,8 +154,10 @@ class BootstrapDataQueryEntityRegistry implements DataPatchInterface
                 'code' => 'sales_invoice',
                 'label' => 'Invoices',
                 'description' => 'Sales invoices',
-                'collection_class' => 'Magento\Sales\Model\ResourceModel\Order\Invoice\Collection',
-                'searchable_fields' => json_encode(['entity_id', 'increment_id', 'order_id', 'status', 'created_at']),
+                'collection_class' => InvoiceCollection::class,
+                'searchable_fields' => json_encode(
+                    ['entity_id', 'increment_id', 'order_id', 'status', 'created_at']
+                ),
                 'filterable_fields' => json_encode(['status', 'created_at', 'order_id']),
                 'sortable_fields' => json_encode(['created_at', 'entity_id']),
                 'max_results' => 100,
@@ -135,8 +167,10 @@ class BootstrapDataQueryEntityRegistry implements DataPatchInterface
                 'code' => 'sales_shipment',
                 'label' => 'Shipments',
                 'description' => 'Order shipments',
-                'collection_class' => 'Magento\Sales\Model\ResourceModel\Order\Shipment\Collection',
-                'searchable_fields' => json_encode(['entity_id', 'increment_id', 'order_id', 'created_at']),
+                'collection_class' => ShipmentCollection::class,
+                'searchable_fields' => json_encode(
+                    ['entity_id', 'increment_id', 'order_id', 'created_at']
+                ),
                 'filterable_fields' => json_encode(['order_id', 'created_at']),
                 'sortable_fields' => json_encode(['created_at', 'entity_id']),
                 'max_results' => 100,
@@ -145,7 +179,6 @@ class BootstrapDataQueryEntityRegistry implements DataPatchInterface
         ];
 
         foreach ($entities as $entity) {
-            // Check if entity code already exists
             $select = $connection->select()->from($entitiesTable)->where('code = ?', $entity['code']);
             $existing = $connection->fetchOne($select);
 
@@ -155,6 +188,12 @@ class BootstrapDataQueryEntityRegistry implements DataPatchInterface
         }
     }
 
+    /**
+     * Check if the query_entity tool already exists.
+     *
+     * @param mixed $connection
+     * @return bool
+     */
     private function toolExists($connection): bool
     {
         $toolsTable = $this->resourceConnection->getTableName('gtstudio_ai_tools');
@@ -164,12 +203,18 @@ class BootstrapDataQueryEntityRegistry implements DataPatchInterface
         return (bool)$existing;
     }
 
-    public static function getDependencies()
+    /**
+     * @inheritdoc
+     */
+    public static function getDependencies(): array
     {
         return [];
     }
 
-    public function getAliases()
+    /**
+     * @inheritdoc
+     */
+    public function getAliases(): array
     {
         return [];
     }

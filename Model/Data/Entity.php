@@ -6,15 +6,33 @@ use Gtstudio\AiDataQuery\Api\Data\EntityInterface;
 
 class Entity implements EntityInterface
 {
+    /** @var string */
     private string $code;
+
+    /** @var string */
     private string $label;
+
+    /** @var string */
     private string $collectionClass;
+
+    /** @var array */
     private array $searchableFields;
+
+    /** @var array */
     private array $filterableFields;
+
+    /** @var array */
     private array $sortableFields;
+
+    /** @var int */
     private int $maxResults;
+
+    /** @var bool */
     private bool $isActive;
 
+    /**
+     * @param array $data
+     */
     public function __construct(array $data = [])
     {
         $this->code = $data['code'] ?? '';
@@ -33,41 +51,81 @@ class Entity implements EntityInterface
         $this->isActive = (bool)($data['is_active'] ?? true);
     }
 
+    /**
+     * Get entity code.
+     *
+     * @return string
+     */
     public function getCode(): string
     {
         return $this->code;
     }
 
+    /**
+     * Get entity label.
+     *
+     * @return string
+     */
     public function getLabel(): string
     {
         return $this->label;
     }
 
+    /**
+     * Get collection class path.
+     *
+     * @return string
+     */
     public function getCollectionClass(): string
     {
         return $this->collectionClass;
     }
 
+    /**
+     * Get searchable fields.
+     *
+     * @return array
+     */
     public function getSearchableFields(): array
     {
         return $this->searchableFields;
     }
 
+    /**
+     * Get filterable fields.
+     *
+     * @return array
+     */
     public function getFilterableFields(): array
     {
         return $this->filterableFields;
     }
 
+    /**
+     * Get sortable fields.
+     *
+     * @return array
+     */
     public function getSortableFields(): array
     {
         return $this->sortableFields;
     }
 
+    /**
+     * Get max results allowed.
+     *
+     * @return int
+     */
     public function getMaxResults(): int
     {
         return $this->maxResults;
     }
 
+    /**
+     * Check if entity is queryable.
+     *
+     * @return bool
+     */
     public function isActive(): bool
     {
         return $this->isActive;

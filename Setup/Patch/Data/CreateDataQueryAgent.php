@@ -24,6 +24,12 @@ class CreateDataQueryAgent implements DataPatchInterface
         'product_performance',
     ];
 
+    /**
+     * @param GetAiAgentByCodeInterface $getAiAgentByCode
+     * @param SaveAiAgentInterface $saveAiAgent
+     * @param AiAgentDataFactory $agentFactory
+     * @param ResourceConnection $resourceConnection
+     */
     public function __construct(
         private readonly GetAiAgentByCodeInterface $getAiAgentByCode,
         private readonly SaveAiAgentInterface $saveAiAgent,
@@ -32,6 +38,9 @@ class CreateDataQueryAgent implements DataPatchInterface
     ) {
     }
 
+    /**
+     * @inheritdoc
+     */
     public function apply(): self
     {
         if ($this->agentExists()) {
@@ -77,6 +86,9 @@ class CreateDataQueryAgent implements DataPatchInterface
         return $this;
     }
 
+    /**
+     * @inheritdoc
+     */
     public static function getDependencies(): array
     {
         return [
@@ -84,11 +96,19 @@ class CreateDataQueryAgent implements DataPatchInterface
         ];
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getAliases(): array
     {
         return [];
     }
 
+    /**
+     * Check if the data query agent already exists.
+     *
+     * @return bool
+     */
     private function agentExists(): bool
     {
         try {
@@ -99,6 +119,11 @@ class CreateDataQueryAgent implements DataPatchInterface
         }
     }
 
+    /**
+     * Resolve tool entity IDs by code.
+     *
+     * @return array
+     */
     private function resolveToolIds(): array
     {
         $connection = $this->resourceConnection->getConnection();
